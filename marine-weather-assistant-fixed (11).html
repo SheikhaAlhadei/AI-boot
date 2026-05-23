@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مساعدك الذكي</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ocean-deep:#0a1628;--ocean-mid:#0d2444;--ocean-blue:#1565c0;
+  --ocean-bright:#1e88e5;--ocean-light:#42a5f5;--wave-cyan:#00bcd4;
+  --foam-white:#e3f2fd;--text-primary:#e8f4fd;--text-muted:#90caf9;
+  --accent-gold:#ffd54f;--danger-red:#ef5350;--success-green:#26c6da;
+  --sidebar-bg:rgba(13,36,68,.95);--border-glow:rgba(66,165,245,.3);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:'Tajawal',sans-serif;
+  background:linear-gradient(135deg,#020b18 0%,#0a1628 50%,#061020 100%);
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  padding:20px;overflow:hidden;position:relative;
+}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse at 20% 80%,rgba(21,101,192,.15) 0%,transparent 50%),
+             radial-gradient(ellipse at 80% 20%,rgba(0,172,193,.1) 0%,transparent 50%);}
+.bg-waves{position:fixed;bottom:0;left:0;right:0;height:180px;pointer-events:none;overflow:hidden;opacity:.12}
+.bg-waves svg{width:200%;animation:waveMove 12s linear infinite}
+@keyframes waveMove{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+.chat-window{
+  width:100%;max-width:1010px;height:520px;background:var(--ocean-deep);
+  border-radius:20px;border:1px solid var(--border-glow);
+  box-shadow:0 0 60px rgba(21,101,192,.3),0 0 120px rgba(0,172,193,.08),inset 0 1px 0 rgba(255,255,255,.05);
+  display:flex;flex-direction:column;overflow:hidden;
+  animation:windowIn .6s cubic-bezier(.16,1,.3,1) forwards;
+}
+@keyframes windowIn{from{opacity:0;transform:scale(.95) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}}
+
+.title-bar{
+  background:linear-gradient(90deg,var(--ocean-mid),#0d2c50);
+  padding:0 16px;height:54px;display:flex;align-items:center;
+  justify-content:space-between;border-bottom:1px solid var(--border-glow);flex-shrink:0;gap:10px;
+}
+.tb-left{display:flex;align-items:center;gap:10px}
+.tb-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.title-icon{
+  width:32px;height:32px;border-radius:50%;
+  background:linear-gradient(135deg,var(--ocean-bright),var(--wave-cyan));
+  display:flex;align-items:center;justify-content:center;font-size:16px;
+  animation:pulseGlow 3s ease-in-out infinite;flex-shrink:0;
+}
+@keyframes pulseGlow{0%,100%{box-shadow:0 0 0 0 rgba(30,136,229,.4)}50%{box-shadow:0 0 0 8px rgba(30,136,229,0)}}
+.title-text{color:var(--text-primary);font-size:15px;font-weight:700;white-space:nowrap}
+.ctrl-wrap{display:flex;gap:7px}
+.ctrl-btn{width:13px;height:13px;border-radius:50%;cursor:pointer;transition:opacity .2s}
+.ctrl-btn:hover{opacity:.7}
+.ctrl-min{background:var(--accent-gold)}.ctrl-max{background:var(--success-green)}.ctrl-close{background:var(--danger-red)}
+
+/* City selector */
+.city-select{
+  background:rgba(10,22,40,.75);border:1px solid var(--border-glow);
+  border-radius:20px;color:var(--text-primary);font-family:'Tajawal',sans-serif;
+  font-size:12px;padding:5px 10px;outline:none;cursor:pointer;max-width:130px;
+}
+.city-select option{background:#0d2444;color:var(--text-primary)}
+
+/* Language toggle */
+.lang-toggle{display:flex;border-radius:20px;overflow:hidden;border:1px solid var(--border-glow);background:rgba(10,22,40,.6)}
+.lang-btn{
+  padding:5px 11px;font-size:12px;font-weight:600;cursor:pointer;
+  border:none;background:transparent;color:var(--text-muted);transition:all .2s;
+  font-family:'Tajawal',sans-serif;
+}
+.lang-btn.active{background:var(--ocean-blue);color:#fff}
+
+/* Body */
+.chat-body{display:flex;flex:1;overflow:hidden}
+
+/* Sidebar */
+.sidebar{
+  width:225px;background:var(--sidebar-bg);
+  border-inline-start:1px solid var(--border-glow);
+  display:flex;flex-direction:column;overflow-y:auto;
+  padding:10px 7px;gap:4px;flex-shrink:0;
+}
+.sidebar::-webkit-scrollbar{width:3px}
+.sidebar::-webkit-scrollbar-thumb{background:var(--ocean-blue);border-radius:4px}
+.sidebar-label{color:var(--text-muted);font-size:10px;font-weight:700;padding:5px 8px 2px;letter-spacing:.06em;opacity:.6;text-transform:uppercase}
+.quick-btn{
+  display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:10px;
+  border:1px solid transparent;background:rgba(21,101,192,.07);cursor:pointer;
+  transition:all .22s;color:var(--text-primary);font-family:'Tajawal',sans-serif;
+  font-size:13px;font-weight:500;text-align:inherit;direction:inherit;width:100%;
+}
+.quick-btn:hover{background:rgba(21,101,192,.22);border-color:rgba(66,165,245,.35)}
+.quick-btn.active{background:linear-gradient(135deg,rgba(21,101,192,.35),rgba(13,71,161,.35));border-color:rgba(66,165,245,.5);color:#fff;box-shadow:0 0 10px rgba(21,101,192,.25)}
+.btn-icon{width:27px;height:27px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;background:rgba(66,165,245,.12)}
+
+/* Chat */
+.chat-area{flex:1;display:flex;flex-direction:column;overflow:hidden;background:linear-gradient(180deg,rgba(10,22,40,.9) 0%,var(--ocean-deep) 100%)}
+.messages{flex:1;overflow-y:auto;padding:18px 20px;display:flex;flex-direction:column;gap:13px}
+.messages::-webkit-scrollbar{width:3px}
+.messages::-webkit-scrollbar-thumb{background:var(--ocean-blue);border-radius:4px}
+.msg-row{display:flex;gap:9px;animation:msgIn .38s cubic-bezier(.16,1,.3,1) forwards}
+@keyframes msgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.msg-row.user{flex-direction:row-reverse}
+.avatar{width:35px;height:35px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:16px;align-self:flex-end}
+.avatar.bot{background:linear-gradient(135deg,var(--ocean-bright),var(--wave-cyan));box-shadow:0 0 12px rgba(30,136,229,.4)}
+.avatar.user{background:rgba(255,255,255,.08);border:1px solid var(--border-glow);color:var(--text-muted)}
+.bubble{max-width:70%;padding:11px 14px;border-radius:15px;font-size:14px;line-height:1.75;position:relative}
+.bubble.bot{background:linear-gradient(135deg,#1565c0,#0d47a1);border:1px solid rgba(66,165,245,.22);color:var(--foam-white);border-bottom-right-radius:4px;box-shadow:0 4px 18px rgba(13,71,161,.35)}
+.bubble.user{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);color:var(--text-primary);border-bottom-left-radius:4px}
+.msg-time{font-size:10px;opacity:.55;margin-top:5px;text-align:left;direction:ltr;display:flex;align-items:center;gap:3px}
+.msg-row.user .msg-time{justify-content:flex-end;color:var(--text-muted)}
+.msg-row.user .msg-time::after{content:'✓✓';font-size:10px;color:#4fc3f7}
+.bubble.typing{padding:13px 17px}
+.typing-dots{display:flex;gap:5px;align-items:center}
+.typing-dots span{width:7px;height:7px;border-radius:50%;background:var(--ocean-light);animation:dotBounce 1.2s ease-in-out infinite}
+.typing-dots span:nth-child(2){animation-delay:.2s}
+.typing-dots span:nth-child(3){animation-delay:.4s}
+@keyframes dotBounce{0%,60%,100%{transform:translateY(0);opacity:.5}30%{transform:translateY(-6px);opacity:1}}
+.weather-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
+.chip{display:inline-flex;align-items:center;gap:3px;background:rgba(255,255,255,.1);border-radius:20px;padding:3px 9px;font-size:12px;color:var(--ocean-light)}
+
+.input-area{padding:11px 17px;border-top:1px solid var(--border-glow);display:flex;gap:9px;background:rgba(13,36,68,.8);backdrop-filter:blur(10px);flex-shrink:0;align-items:center}
+.input-field{flex:1;background:rgba(255,255,255,.05);border:1px solid var(--border-glow);border-radius:12px;padding:11px 14px;color:var(--text-primary);font-family:'Tajawal',sans-serif;font-size:14px;outline:none;transition:border-color .2s,box-shadow .2s;direction:inherit}
+.input-field::placeholder{color:rgba(144,202,249,.38)}
+.input-field:focus{border-color:rgba(66,165,245,.6);box-shadow:0 0 0 3px rgba(66,165,245,.1)}
+.send-btn{width:44px;height:44px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--ocean-bright),var(--ocean-blue));color:#fff;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;box-shadow:0 4px 14px rgba(21,101,192,.4);flex-shrink:0}
+.send-btn:hover{transform:scale(1.06);box-shadow:0 6px 18px rgba(21,101,192,.6)}
+.send-btn:active{transform:scale(.97)}
+
+
+.status-bar{padding:5px 17px;background:rgba(0,0,0,.2);border-top:1px solid rgba(66,165,245,.08);display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
+.status-dot{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-muted)}
+.dot-live{width:7px;height:7px;border-radius:50%;background:var(--success-green);animation:livePulse 2s ease-in-out infinite}
+@keyframes livePulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(1.3)}}
+.status-info{font-size:11px;color:rgba(144,202,249,.4)}
+
+/* EN mode */
+html[lang="en"] body,.en-font{font-family:'Inter',sans-serif!important}
+html[lang="en"] .input-field,html[lang="en"] .bubble,html[lang="en"] .title-text,
+html[lang="en"] .status-dot,html[lang="en"] .status-info,html[lang="en"] .sidebar-label,
+html[lang="en"] .quick-btn,html[lang="en"] .city-select{font-family:'Inter',sans-serif!important}
+</style>
+</head>
+<body>
+
+<div class="bg-waves">
+  <svg viewBox="0 0 1440 120" xmlns="http://www.w3.org/2000/svg">
+    <path d="M0,60 C240,100 480,20 720,60 C960,100 1200,20 1440,60 L1440,120 L0,120 Z" fill="rgba(21,101,192,0.5)"/>
+    <path d="M0,80 C360,40 720,100 1080,60 C1260,40 1380,80 1440,80 L1440,120 L0,120 Z" fill="rgba(0,172,193,0.3)"/>
+  </svg>
+</div>
+
+<div class="chat-window" id="chatWindow">
+
+  <div class="title-bar">
+    <div class="tb-left">
+      <div class="ctrl-wrap">
+        <div class="ctrl-btn ctrl-close"></div>
+        <div class="ctrl-btn ctrl-max"></div>
+        <div class="ctrl-btn ctrl-min"></div>
+      </div>
+      <div class="title-icon">🌊</div>
+      <span class="title-text" id="titleText">مساعد الطقفي والموج</span>
+    </div>
+    <div class="tb-right">
+      <select class="city-select" id="citySelect" onchange="onCityChange()">
+        <option value="muscat">🏙 مسقط</option>
+        <option value="salalah">🌴 صلالة</option>
+        <option value="sohar">⚓ صحار</option>
+        <option value="sur">🐢 صور</option>
+        <option value="nizwa">🏔 نزوى</option>
+        <option value="duqm">🛢 الدقم</option>
+        <option value="khasab">⛵ خصب</option>
+        <option value="masirah">🏝 مصيرة</option>
+        <option value="shinas">🎣 شناص</option>
+        <option value="barka">🌅 بركاء</option>
+      </select>
+      <div class="lang-toggle">
+        <button class="lang-btn active" id="btnAr" onclick="setLang('ar')">عربي</button>
+        <button class="lang-btn" id="btnEn" onclick="setLang('en')">EN</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="chat-body">
+
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-label" id="sidebarLabel">أسئلة سريعة</div>
+      <button class="quick-btn active" id="q0" onclick="askQuestion(this,0)"><span class="btn-icon">☀️</span><span class="qtext">كيف الطقس اليوم؟</span></button>
+      <button class="quick-btn" id="q1" onclick="askQuestion(this,1)"><span class="btn-icon">⛈️</span><span class="qtext">ما احتمالية العواصف البحرية؟</span></button>
+      <button class="quick-btn" id="q2" onclick="askQuestion(this,2)"><span class="btn-icon">🌊</span><span class="qtext">ما حالة البحر الآن؟</span></button>
+      <button class="quick-btn" id="q3" onclick="askQuestion(this,3)"><span class="btn-icon">💨</span><span class="qtext">ما سرعة واتجاه الرياح؟</span></button>
+      <button class="quick-btn" id="q4" onclick="askQuestion(this,4)"><span class="btn-icon">🔄</span><span class="qtext">ما التيارات البحرية الحالية؟</span></button>
+      <button class="quick-btn" id="q5" onclick="askQuestion(this,5)"><span class="btn-icon">📏</span><span class="qtext">ما ارتفاع الأمواج الحالي؟</span></button>
+      <button class="quick-btn" id="q6" onclick="askQuestion(this,6)"><span class="btn-icon">🕐</span><span class="qtext">متى موعد المد والجزر اليوم؟</span></button>
+      <button class="quick-btn" id="q7" onclick="askQuestion(this,7)"><span class="btn-icon">🐟</span><span class="qtext">ما نشاط الأسماك اليوم؟</span></button>
+      <button class="quick-btn" id="q8" onclick="askQuestion(this,8)"><span class="btn-icon">🌡️</span><span class="qtext">ما الضغط الجوي الحالي؟</span></button>
+      <button class="quick-btn" id="q9" onclick="askQuestion(this,9)"><span class="btn-icon">⚠️</span><span class="qtext">تحذيرات السلامة للصيد والكاياك والغوص</span></button>
+      <button class="quick-btn" id="q10" onclick="openCustom()"><span class="btn-icon">💬</span><span class="qtext">سؤال آخر...</span></button>
+    </div>
+
+    <div class="chat-area">
+      <div class="messages" id="messages"></div>
+      <div class="input-area">
+
+        <input class="input-field" id="userInput" type="text" onkeydown="if(event.key==='Enter')sendMessage()"/>
+        <button class="send-btn" id="sendBtn" onclick="sendMessage()">➤</button>
+      </div>
+      <div class="status-bar">
+        <div class="status-dot"><div class="dot-live"></div><span id="statusText">متصل بالمنظومة البحرية</span></div>
+        <div class="status-info" id="statusInfo">بيانات عُمان والخليج العربي · عربي / English</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+var currentLang='ar', currentCity='muscat', conversationHistory=[];
+
+var cities={
+  muscat:{ar:'مسقط',en:'Muscat'},
+  salalah:{ar:'صلالة',en:'Salalah'},
+  sohar:{ar:'صحار',en:'Sohar'},
+  sur:{ar:'صور',en:'Sur'},
+  nizwa:{ar:'نزوى',en:'Nizwa'},
+  duqm:{ar:'الدقم',en:'Duqm'},
+  khasab:{ar:'خصب',en:'Khasab'},
+  masirah:{ar:'جزيرة مصيرة',en:'Masirah Island'},
+  shinas:{ar:'شناص',en:'Shinas'},
+  barka:{ar:'بركاء',en:'Barka'}
+};
+
+var T={
+  ar:{
+    title:'مساعدك الذكي',
+    sidebarLabel:'أسئلة سريعة',
+    placeholder:'اكتب رسالتك هنا...',
+    statusConn:'متصل بالمنظومة البحرية',
+    statusInfo:'بيانات عُمان والخليج العربي · عربي / English',
+    welcome:function(c){return'مرحباً! أنا مساعدك الذكي للطقس البحري 🌊<br>المدينة الحالية: <strong>'+cities[c].ar+'</strong><br><br>اختر سؤالاً من القائمة أو اكتب ما تريد معرفته:'},
+    chips:['🌡️ الطقس','🌊 البحر','⚓ المد والجزر','🐟 الأسماك','💨 الرياح'],
+    cityChanged:function(c){return'تم تغيير المدينة إلى <strong>'+cities[c].ar+'</strong> 📍\nكيف يمكنني مساعدتك الآن؟'},
+    langChanged:'تم التبديل إلى العربية 🌐',
+    questions:['كيف الطقس اليوم؟','ما احتمالية العواصف البحرية؟','ما حالة البحر الآن؟','ما سرعة واتجاه الرياح؟','ما التيارات البحرية الحالية؟','ما ارتفاع الأمواج الحالي؟','متى موعد المد والجزر اليوم؟','ما نشاط الأسماك اليوم؟','ما الضغط الجوي الحالي؟','تحذيرات السلامة للصيد والكاياك والغوص','سؤال آخر...'],
+    errMsg:'⚠️ خطأ في الاتصال. يرجى المحاولة مرة أخرى.'
+  },
+  en:{
+    title:'Marine Weather Assistant',
+    sidebarLabel:'Quick Questions',
+    placeholder:'Type your message here...',
+    statusConn:'Connected to Marine System',
+    statusInfo:'Oman & Gulf Region Data · AR / EN',
+    welcome:function(c){return'Hello! I\'m your marine weather assistant 🌊<br>Selected city: <strong>'+cities[c].en+'</strong><br><br>Choose a question or type anything below:'},
+    chips:['🌡️ Weather','🌊 Sea State','⚓ Tides','🐟 Fish Activity','💨 Wind'],
+    cityChanged:function(c){return'City changed to <strong>'+cities[c].en+'</strong> 📍\nHow can I help you?'},
+    langChanged:'Switched to English 🌐',
+    questions:["What's the weather today?",'Storm probability?',"Current sea state?",'Wind speed & direction?','Marine currents?','Current wave height?',"Today's tide times?",'Fish activity today?','Atmospheric pressure?','Safety warnings','Other question...'],
+    errMsg:'⚠️ Connection error. Please try again.'
+  }
+};
+
+function applyLang(){
+  var t=T[currentLang];
+  var isAr=currentLang==='ar';
+  document.documentElement.lang=currentLang;
+  document.documentElement.dir=isAr?'rtl':'ltr';
+  document.getElementById('titleText').textContent=t.title;
+  document.getElementById('sidebarLabel').textContent=t.sidebarLabel;
+  document.getElementById('userInput').placeholder=t.placeholder;
+  document.getElementById('statusText').textContent=t.statusConn;
+  document.getElementById('statusInfo').textContent=t.statusInfo;
+  document.getElementById('btnAr').classList.toggle('active',isAr);
+  document.getElementById('btnEn').classList.toggle('active',!isAr);
+  // Update city option labels
+  updateCityLabels();
+  // Update quick button texts
+  t.questions.forEach(function(q,i){
+    var b=document.getElementById('q'+i);
+    if(b) b.querySelector('.qtext').textContent=q;
+  });
+}
+
+function updateCityLabels(){
+  var sel=document.getElementById('citySelect');
+  var isAr=currentLang==='ar';
+  var icons={'muscat':'🏙','salalah':'🌴','sohar':'⚓','sur':'🐢','nizwa':'🏔','duqm':'🛢','khasab':'⛵','masirah':'🏝','shinas':'🎣','barka':'🌅'};
+  Array.from(sel.options).forEach(function(opt){
+    var key=opt.value;
+    opt.textContent=icons[key]+' '+(isAr?cities[key].ar:cities[key].en);
+  });
+}
+
+function setLang(lang){
+  if(currentLang===lang)return;
+  currentLang=lang;
+  applyLang();
+  addMessage(T[lang].langChanged+'<br>'+T[lang].welcome(currentCity)+'<div class="weather-chips">'+T[lang].chips.map(function(c){return'<span class="chip">'+c+'</span>'}).join('')+'</div>','bot',false);
+}
+
+function onCityChange(){
+  currentCity=document.getElementById('citySelect').value;
+  addMessage(T[currentLang].cityChanged(currentCity),'bot',false);
+}
+
+function scrollToBottom(){
+  var m=document.getElementById('messages');
+  m.scrollTop=m.scrollHeight;
+}
+
+function getTime(){
+  var n=new Date();
+  var h=n.getHours().toString().padStart(2,'0');
+  var m=n.getMinutes().toString().padStart(2,'0');
+  return h+':'+m;
+}
+function addMessage(html,role,showTime){
+  var msgs=document.getElementById('messages');
+  var row=document.createElement('div');
+  row.className='msg-row '+role;
+  var av=document.createElement('div');
+  av.className='avatar '+role;
+  av.textContent=role==='bot'?'🤖':'👤';
+  var bubble=document.createElement('div');
+  bubble.className='bubble '+role;
+  bubble.style.textAlign=currentLang==='ar'?'right':'left';
+  bubble.style.direction=currentLang==='ar'?'rtl':'ltr';
+  var txt=document.createElement('div');
+  var processed=html.replace(/\n/g,'<br>').replace(/\[([^\]]+)\]\((https?:\/\/[^\)]+)\)/g,'<a href="$2" target="_blank" style="color:#90caf9;font-size:11px;opacity:.8;text-decoration:none;">$1 ↗</a>');
+  txt.innerHTML=processed;
+  bubble.appendChild(txt);
+  if(showTime!==false){
+    var time=document.createElement('div');
+    time.className='msg-time';
+    time.textContent=getTime();
+    bubble.appendChild(time);
+  }
+  row.appendChild(av);
+  row.appendChild(bubble);
+  msgs.appendChild(row);
+  scrollToBottom();
+}
+
+function addTyping(){
+  var msgs=document.getElementById('messages');
+  var row=document.createElement('div');
+  row.className='msg-row';row.id='typing-ind';
+  var av=document.createElement('div');av.className='avatar bot';av.textContent='🤖';
+  var b=document.createElement('div');b.className='bubble bot typing';
+  b.innerHTML='<div class="typing-dots"><span></span><span></span><span></span></div>';
+  row.appendChild(av);row.appendChild(b);msgs.appendChild(row);scrollToBottom();
+}
+function removeTyping(){var t=document.getElementById('typing-ind');if(t)t.remove();}
+
+// إحداثيات المدن
+var CITY_COORDS={
+  muscat:{lat:23.6,lon:58.6},
+  salalah:{lat:17.0,lon:54.1},
+  sohar:{lat:24.4,lon:56.7},
+  nizwa:{lat:22.9,lon:57.5},
+  khasab:{lat:26.2,lon:56.2},
+  sur:{lat:22.5,lon:59.5},
+  duqm:{lat:19.7,lon:57.7},
+  masirah:{lat:20.7,lon:58.9}
+};
+
+// كاش البيانات — صالح 10 دقائق
+var _weatherCache={};
+async function fetchWeatherData(city){
+  var now=Date.now();
+  if(_weatherCache[city]&&(now-_weatherCache[city].ts)<600000){
+    return _weatherCache[city].data;
+  }
+  var c=CITY_COORDS[city]||CITY_COORDS.muscat;
+  var [marineRes,weatherRes]=await Promise.all([
+    fetch('https://marine-api.open-meteo.com/v1/marine?latitude='+c.lat+'&longitude='+c.lon+'&current=wave_height,wave_direction,wave_period,wind_wave_height,swell_wave_height,ocean_current_velocity,ocean_current_direction&timezone=Asia%2FMuscat'),
+    fetch('https://api.open-meteo.com/v1/forecast?latitude='+c.lat+'&longitude='+c.lon+'&current=temperature_2m,relative_humidity_2m,wind_speed_10m,wind_direction_10m,surface_pressure,weather_code,precipitation&timezone=Asia%2FMuscat&forecast_days=1')
+  ]);
+  var marine=await marineRes.json();
+  var weather=await weatherRes.json();
+  var data={marine,weather,coords:c};
+  _weatherCache[city]={ts:now,data:data};
+  return data;
+}
+
+// حساب المد والجزر تقريبي
+function getTideInfo(city){
+  var now=new Date();
+  var hour=now.getHours();
+  var min=now.getMinutes();
+  // نمط المد تقريبي — 6 ساعات دورة
+  var cycle=((hour*60+min)%(12*60))/(12*60);
+  var height=(Math.sin(cycle*2*Math.PI)*1.2+1.5).toFixed(2);
+  var rising=Math.cos(cycle*2*Math.PI)>0;
+  var nextChange=Math.round((1-cycle)*6*60);
+  var nextH=Math.floor(nextChange/60);
+  var nextM=nextChange%60;
+  return {height, rising, nextH, nextM};
+}
+
+// التاريخ الهجري
+function getHijriDate(){
+  var now=new Date();
+  // حساب تقريبي للتاريخ الهجري
+  var jd=Math.floor((now/86400000)+2440587.5);
+  var l=jd-1948440+10632;
+  var n=Math.floor((l-1)/10631);
+  l=l-10631*n+354;
+  var j=(Math.floor((10985-l)/5316))*(Math.floor((50*l)/17719))+(Math.floor(l/5670))*(Math.floor((43*l)/15238));
+  l=l-(Math.floor((30-j)/15))*(Math.floor((17719*j)/50))-(Math.floor(j/16))*(Math.floor((15238*j)/43))+29;
+  var month=Math.floor((24*l)/709);
+  var day=l-Math.floor((709*month)/24);
+  var year=30*n+j-30;
+  var months=['محرم','صفر','ربيع الأول','ربيع الآخر','جمادى الأولى','جمادى الآخرة','رجب','شعبان','رمضان','شوال','ذو القعدة','ذو الحجة'];
+  return day+' '+months[month-1]+' '+year+'هـ';
+}
+
+// وصف الطقس بالعربي
+function weatherCodeAr(code){
+  if(code===0)return'صحو تام ☀️';
+  if(code<=2)return'غائم جزئياً ⛅';
+  if(code===3)return'غائم كلياً ☁️';
+  if(code<=49)return'ضباب 🌫️';
+  if(code<=69)return'مطر 🌧️';
+  if(code<=79)return'ثلج ❄️';
+  if(code<=99)return'عواصف رعدية ⛈️';
+  return'غير محدد';
+}
+
+function windDirAr(deg){
+  var dirs=['شمال','شمال شرق','شرق','جنوب شرق','جنوب','جنوب غرب','غرب','شمال غرب'];
+  return dirs[Math.round(deg/45)%8];
+}
+
+function seaStateAr(waveH){
+  if(waveH<0.5)return'هادئ جداً 🟢';
+  if(waveH<1.25)return'هادئ 🟢';
+  if(waveH<2.5)return'معتدل 🟡';
+  if(waveH<4)return'خشن 🟠';
+  return'عاصف 🔴';
+}
+
+async function callAPI(userMessage){
+  var cityName=currentLang==='ar'?cities[currentCity].ar:cities[currentCity].en;
+  
+  // تحديد نوع السؤال لإرسال بيانات أقل
+  function detectTopic(msg){
+    var m=msg.toLowerCase();
+    if(/رياح|wind|سرعة|اتجاه/.test(m)) return 'wind';
+    if(/موج|wave|أمواج|ارتفاع/.test(m)) return 'waves';
+    if(/مد|جزر|tide/.test(m)) return 'tide';
+    if(/تيار|current/.test(m)) return 'current';
+    if(/ضغط|pressure/.test(m)) return 'pressure';
+    if(/عاصف|storm|احتمال/.test(m)) return 'storm';
+    if(/سمك|أسماك|fish|صيد/.test(m)) return 'fish';
+    if(/تحذير|سلامة|safety|كاياك|غوص/.test(m)) return 'safety';
+    if(/حال|بحر|sea|الآن/.test(m)) return 'sea';
+    return 'general';
+  }
+
+  var weatherData='';
+  try{
+    var data=await fetchWeatherData(currentCity);
+    var m=data.marine.current||{};
+    var w=data.weather.current||{};
+    var tide=getTideInfo(currentCity);
+    var topic=detectTopic(userMessage);
+
+    // بيانات مشتركة دائماً (قصيرة)
+    var base='المدينة: '+cityName+' | الوقت: '+new Date().toLocaleTimeString('ar-OM')+'\n';
+
+    if(topic==='wind'){
+      weatherData=base+'💨 الرياح: '+w.wind_speed_10m+' كم/ساعة | الاتجاه: '+windDirAr(w.wind_direction_10m)+' ('+w.wind_direction_10m+'°)';
+    } else if(topic==='waves'){
+      weatherData=base+'🌊 الأمواج: '+m.wave_height+' م | أمواج الرياح: '+m.wind_wave_height+' م | المد: '+m.swell_wave_height+' م | الفترة: '+m.wave_period+' ث | الحالة: '+seaStateAr(m.wave_height);
+    } else if(topic==='tide'){
+      weatherData=base+'🌊 المد: '+tide.height+' م | '+( tide.rising?'مد 📈':'جزر 📉')+' | التغيير بعد: '+tide.nextH+'س '+tide.nextM+'د';
+    } else if(topic==='current'){
+      weatherData=base+'🌀 التيارات: '+m.ocean_current_velocity+' م/ث | الاتجاه: '+m.ocean_current_direction+'°';
+    } else if(topic==='pressure'){
+      weatherData=base+'📊 الضغط: '+w.surface_pressure+' hPa';
+    } else if(topic==='sea'){
+      weatherData=base+'🌊 البحر: '+seaStateAr(m.wave_height)+' | الأمواج: '+m.wave_height+' م | التيار: '+m.ocean_current_velocity+' م/ث';
+    } else if(topic==='storm'||topic==='safety'||topic==='fish'){
+      weatherData=base+
+        '💨 الرياح: '+w.wind_speed_10m+' كم/ساعة ('+windDirAr(w.wind_direction_10m)+')\n'+
+        '🌊 الأمواج: '+m.wave_height+' م | الحالة: '+seaStateAr(m.wave_height)+'\n'+
+        '🌀 التيار: '+m.ocean_current_velocity+' م/ث'+'\n'+
+        '🌊 المد: '+tide.height+' م ('+(tide.rising?'مد':'جزر')+')'+'\n'+
+        '🌤️ الطقس: '+weatherCodeAr(w.weather_code);
+    } else {
+      weatherData=base+
+        '🌤️ '+weatherCodeAr(w.weather_code)+' | '+w.temperature_2m+'°C | رطوبة '+w.relative_humidity_2m+'%\n'+
+        '💨 رياح '+w.wind_speed_10m+' كم/ساعة ('+windDirAr(w.wind_direction_10m)+')\n'+
+        '🌊 أمواج '+m.wave_height+' م | '+seaStateAr(m.wave_height)+'\n'+
+        '🌊 مد '+tide.height+' م ('+( tide.rising?'مد📈':'جزر📉')+')';
+    }
+  }catch(e){
+    weatherData='[تعذر جلب البيانات]';
+  }
+
+  var sys=`أنت "مساعدك الذكي" — مساعد بحري ذكي لسلطنة عُمان. شخصيتك: ودود، خفيف، مباشر. تتكلم بشكل طبيعي مو رسمي زيادة.
+المدينة: ${cityName}
+
+البيانات الحية:
+${weatherData}
+
+طريقة ردك:
+- تكلم بشكل طبيعي وسلس — لا تبدأ كل رد بنفس الكلمة أو العبارة
+- لا تستخدم "والله" أو "أوكيه" أو "تفضل" بشكل متكرر — تنوع في البداية أو ابدأ مباشرة بالمعلومة
+- اعطِ المعلومة مختصرة وواضحة مع الأرقام
+- في السطر الأخير فقط: 📡 المصدر: [Open-Meteo Marine API](https://open-meteo.com)
+- لا توصيات ولا نصائح — فقط أرقام وحقائق
+- اكتشف لغة المستخدم وأجب بنفسها
+
+إذا كتب المستخدم تحية (هلا، مرحبا، السلام، hi، hello): رد بتحية قصيرة طبيعية مثل "هلا! كيف أقدر أساعدك؟" فقط — لا تعرّف نفسك بالكامل
+إذا اختار "سؤال آخر..." أو سأل عن قدراتك: اذكر المواضيع المتاحة بشكل مختصر (الأمواج، الرياح، المد، التيارات، الضغط، الأسماك، التحذيرات) واسأله وش يبي
+
+كيف تجاوب على كل سؤال:
+🌤️ الطقس اليوم: حالة السماء + درجة الحرارة + الرطوبة
+⛈️ احتمالية العواصف: حلل سرعة الرياح + ارتفاع الأمواج + رمز الطقس وقل هل الأجواء مؤاتية للعواصف أم لا بالأرقام
+🌊 حالة البحر: ارتفاع الأمواج + وصف الحالة
+💨 الرياح: السرعة + الاتجاه
+🌀 التيارات: السرعة + الاتجاه
+📊 الضغط الجوي: الرقم فقط
+🐟 نشاط الأسماك: حلل بيانات الأمواج والمد والتيارات وقل إذا الظروف مناسبة بناءً على الأرقام فقط
+⚠️ تحذيرات الصيد والكاياك والغوص: اذكر أرقام الرياح والأمواج والتيارات بشكل منظم
+🌊 المد والجزر: المنسوب + الحالة + وقت التغيير القادم
+
+تعامل بشكل طبيعي مع المستخدم — رد على التحيات والكلام العادي بشكل ودود وقصير.
+لكن إذا سألك عن أي موضوع آخر غير الطقس والبحر (مثل الطبخ، الرياضة، السياسة، الأخبار، إلخ): قل بشكل طبيعي "هذا ما أقدر أساعدك فيه، أنا متخصص بالطقس البحري فقط" — بدون تفصيل زيادة.`;
+
+  try{
+    var r=await fetch('https://summer-snow-f32e.sheikhaalhadei.workers.dev',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'gpt-4o-mini',
+        max_tokens:500,
+        messages:[{role:'system',content:sys},...conversationHistory,{role:'user',content:userMessage}]
+      })
+    });
+    if(r.ok){
+      var d=await r.json();
+      var rep=d.choices&&d.choices[0]&&d.choices[0].message&&d.choices[0].message.content;
+      if(rep){
+        // أضف المصدر قسراً إذا ما موجود
+        if(!rep.includes('open-meteo.com')&&!rep.includes('Open-Meteo')){
+          rep=rep+'\n\n📡 [Open-Meteo Marine API](https://open-meteo.com)';
+        }
+        return rep;
+      }
+    }
+  }catch(e){console.warn('Worker error',e);}
+  return T[currentLang].errMsg;
+}
+
+async function sendMessage(text){
+  var input=document.getElementById('userInput');
+  var msg=text||input.value.trim();
+  if(!msg)return;
+  input.value='';
+  addMessage(msg,'user');
+  conversationHistory.push({role:'user',content:msg});
+  addTyping();
+  try{
+    var reply=await callAPI(msg);
+    removeTyping();
+    addMessage(reply,'bot');
+    conversationHistory.push({role:'assistant',content:reply});
+  }catch(e){
+    removeTyping();
+    addMessage(T[currentLang].errMsg,'bot');
+  }
+}
+
+function askQuestion(btn,idx){
+  document.querySelectorAll('.quick-btn').forEach(function(b){b.classList.remove('active')});
+  btn.classList.add('active');
+  var q=T[currentLang].questions[idx];
+  var cityName=currentLang==='ar'?cities[currentCity].ar:cities[currentCity].en;
+  sendMessage(q+' ('+cityName+')');
+}
+
+function openCustom(){document.getElementById('userInput').focus();}
+
+function init(){
+  applyLang();
+  var t=T[currentLang];
+  // ملء نصوص الأزرار صراحةً
+  t.questions.forEach(function(q,i){
+    var b=document.getElementById('q'+i);
+    if(b) b.querySelector('.qtext').textContent=q;
+  });
+  addMessage(t.welcome(currentCity)+'<div class="weather-chips">'+t.chips.map(function(c){return'<span class="chip">'+c+'</span>'}).join('')+'</div>','bot',false);
+}
+
+init();
+</script>
+</body>
+</html>
