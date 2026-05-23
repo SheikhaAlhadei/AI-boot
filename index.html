@@ -142,6 +142,37 @@ html[lang="en"] body,.en-font{font-family:'Inter',sans-serif!important}
 html[lang="en"] .input-field,html[lang="en"] .bubble,html[lang="en"] .title-text,
 html[lang="en"] .status-dot,html[lang="en"] .status-info,html[lang="en"] .sidebar-label,
 html[lang="en"] .quick-btn,html[lang="en"] .city-select{font-family:'Inter',sans-serif!important}
+
+/* ===== MOBILE RESPONSIVE ===== */
+@media (max-width: 640px) {
+  body { padding: 0; overflow: auto; align-items: flex-start; }
+  .chat-window { height: 100svh; height: -webkit-fill-available; max-width: 100%; border-radius: 0; border: none; box-shadow: none; }
+  .title-bar { padding: 0 10px; height: 48px; gap: 6px; }
+  .ctrl-wrap { gap: 5px; }
+  .ctrl-btn { width: 11px; height: 11px; }
+  .title-icon { width: 28px; height: 28px; font-size: 14px; }
+  .title-text { font-size: 12px; }
+  .city-select { max-width: 85px; font-size: 11px; padding: 4px 7px; }
+  .lang-btn { padding: 4px 8px; font-size: 11px; }
+  .chat-body { flex-direction: column; }
+  .sidebar { width: 100%; height: auto; max-height: 52px; flex-direction: row; flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden; padding: 6px 8px; gap: 6px; border-inline-start: none; border-bottom: 1px solid var(--border-glow); -webkit-overflow-scrolling: touch; }
+  .sidebar::-webkit-scrollbar { height: 0; width: 0; }
+  .sidebar-label { display: none; }
+  .quick-btn { min-width: max-content; width: auto; flex-shrink: 0; padding: 6px 12px; font-size: 12px; border-radius: 20px; white-space: nowrap; }
+  .btn-icon { width: 20px; height: 20px; font-size: 11px; border-radius: 6px; }
+  .chat-area { flex: 1; min-height: 0; }
+  .messages { padding: 10px 12px; gap: 10px; }
+  .bubble { max-width: 88%; font-size: 13px; padding: 9px 12px; line-height: 1.65; }
+  .avatar { width: 28px; height: 28px; font-size: 13px; }
+  .input-area { padding: 8px 10px; gap: 7px; }
+  .input-field { font-size: 16px; padding: 10px 12px; border-radius: 10px; }
+  .send-btn { width: 40px; height: 40px; font-size: 15px; border-radius: 10px; }
+  .status-bar { padding: 4px 12px; }
+  .status-info { display: none; }
+  .bg-waves { height: 80px; }
+  .weather-chips { gap: 4px; }
+  .chip { font-size: 11px; padding: 2px 7px; }
+}
 </style>
 </head>
 <body>
@@ -456,7 +487,7 @@ async function callAPI(userMessage){
     if(/ضغط|pressure/.test(m)) return 'pressure';
     if(/عاصف|storm|احتمال/.test(m)) return 'storm';
     if(/سمك|أسماك|fish|صيد/.test(m)) return 'fish';
-    if(/تحذير|سلامة|safety|كاياك|غوص/.test(m)) return 'safety';
+    if(/تحذير|سلامة|safety|كاياك|غوص|سباحة|swim|snorkel|مناسب|ملاءمة/.test(m)) return 'safety';
     if(/حال|بحر|sea|الآن/.test(m)) return 'sea';
     return 'general';
   }
@@ -527,11 +558,13 @@ ${weatherData}
 🌀 التيارات: السرعة + الاتجاه
 📊 الضغط الجوي: الرقم فقط
 🐟 نشاط الأسماك: حلل بيانات الأمواج والمد والتيارات وقل إذا الظروف مناسبة بناءً على الأرقام فقط
-⚠️ تحذيرات الصيد والكاياك والغوص: اذكر أرقام الرياح والأمواج والتيارات بشكل منظم
+⚠️ تحذيرات الصيد والكاياك والغوص والسباحة: اذكر أرقام الرياح والأمواج والتيارات بشكل منظم وقل إذا الظروف مناسبة أم لا
+🏊 سؤال عن السباحة أو الغوص أو الشنركل أو الكاياك أو ملاءمة البحر للأنشطة: هذا ضمن تخصصك — حلل الأمواج والتيارات والرياح وأعط رأيك بالأرقام
 🌊 المد والجزر: المنسوب + الحالة + وقت التغيير القادم
 
 تعامل بشكل طبيعي مع المستخدم — رد على التحيات والكلام العادي بشكل ودود وقصير.
-لكن إذا سألك عن أي موضوع آخر غير الطقس والبحر (مثل الطبخ، الرياضة، السياسة، الأخبار، إلخ): قل بشكل طبيعي "هذا ما أقدر أساعدك فيه، أنا متخصص بالطقس البحري فقط" — بدون تفصيل زيادة.`;
+أسئلة الأنشطة البحرية (سباحة، غوص، صيد، كاياك، شنركل، تجديف، رياضات بحرية) كلها ضمن تخصصك — أجب عليها بتحليل بيانات الطقس والبحر.
+لكن إذا سألك عن أي موضوع آخر غير الطقس والبحر والأنشطة البحرية (مثل الطبخ، الرياضة البرية، السياسة، الأخبار، إلخ): قل بشكل طبيعي "هذا ما أقدر أساعدك فيه، أنا متخصص بالطقس البحري فقط" — بدون تفصيل زيادة.`;
 
   try{
     var r=await fetch('https://summer-snow-f32e.sheikhaalhadei.workers.dev',{
