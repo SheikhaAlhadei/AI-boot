@@ -192,6 +192,9 @@ html[lang="en"] .quick-btn,html[lang="en"] .city-select{font-family:'Inter',sans
 @media (max-width: 640px) {
   body { padding: 0; overflow: hidden; align-items: flex-start; }
   .chat-window { height: 100svh; height: 100dvh; max-width: 100%; border-radius: 0; border: none; box-shadow: none; overflow: hidden; display: flex; flex-direction: column; }
+  .title-bar { position: sticky; top: 0; z-index: 10; flex-shrink: 0; }
+  .input-area { position: sticky; bottom: 0; z-index: 10; flex-shrink: 0; }
+  .bottom-bar { position: sticky; bottom: 0; z-index: 9; flex-shrink: 0; }
   /* HEADER: row1 = controls+icon+title | row2 = switch+city */
   .title-bar {
     padding: 8px 12px 10px;
