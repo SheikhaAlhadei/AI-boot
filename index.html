@@ -41,7 +41,9 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;
   padding:0 16px;height:54px;display:flex;align-items:center;
   justify-content:space-between;border-bottom:1px solid var(--border-glow);flex-shrink:0;gap:10px;
 }
-.tb-left{display:flex;align-items:center;gap:10px}
+.tb-left{display:flex;align-items:center;width:100%;justify-content:space-between;}
+.title-group{display:flex;align-items:center;gap:10px;}
+
 .tb-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
 .title-icon{
   width:32px;height:32px;border-radius:50%;
@@ -51,7 +53,12 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;
 }
 @keyframes pulseGlow{0%,100%{box-shadow:0 0 0 0 rgba(30,136,229,.4)}50%{box-shadow:0 0 0 8px rgba(30,136,229,0)}}
 .title-text{color:var(--text-primary);font-size:15px;font-weight:700;white-space:nowrap}
-.ctrl-wrap{display:flex;gap:7px}
+.ctrl-wrap{display:flex;gap:7px;align-items:center}
+
+
+.ctrl-x-label{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:8px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:rgba(255,255,255,.8);font-size:13px;font-weight:700;cursor:pointer;transition:all .15s;user-select:none;}
+.ctrl-x-label:hover{background:rgba(255,255,255,.22);border-color:rgba(255,255,255,.4);color:#fff;}
+.ctrl-x-label:active{transform:scale(.92);background:rgba(255,255,255,.3);}
 .ctrl-btn{width:13px;height:13px;border-radius:50%;cursor:pointer;transition:opacity .2s}
 .ctrl-btn:hover{opacity:.7}
 .ctrl-min{background:var(--accent-gold)}.ctrl-max{background:var(--success-green)}.ctrl-close{background:var(--danger-red)}
@@ -62,16 +69,35 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;
   border-radius:20px;color:var(--text-primary);font-family:'Tajawal',sans-serif;
   font-size:12px;padding:5px 10px;outline:none;cursor:pointer;max-width:130px;
 }
-.city-select option{background:#0d2444;color:var(--text-primary)}
+.city-select option{background:#0d2444;color:var(--text-primary);font-size:14px;padding:6px;}
+.city-wrap{display:flex;align-items:center;gap:3px;background:rgba(10,22,40,.75);border:1px solid var(--border-glow);border-radius:20px;padding:0 4px 0 6px;}
+.city-pin{font-size:11px;flex-shrink:0;}
+.city-wrap .city-select{background:transparent;border:none;border-radius:0;padding:3px 4px;max-width:80px;font-size:11px;}
+.city-select optgroup{background:#081830;color:rgba(100,180,255,.8);font-size:13px;font-weight:700;}
 
 /* Language toggle */
-.lang-toggle{display:flex;border-radius:20px;overflow:hidden;border:1px solid var(--border-glow);background:rgba(10,22,40,.6)}
-.lang-btn{
-  padding:5px 11px;font-size:12px;font-weight:600;cursor:pointer;
-  border:none;background:transparent;color:var(--text-muted);transition:all .2s;
-  font-family:'Tajawal',sans-serif;
+.lang-toggle{
+  position:relative;display:flex;align-items:center;
+  width:72px;height:32px;border-radius:16px;
+  background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);
+  cursor:pointer;padding:3px;box-sizing:border-box;flex-shrink:0;
+  transition:background .3s;
 }
-.lang-btn.active{background:var(--ocean-blue);color:#fff}
+.lang-toggle::after{
+  content:'';position:absolute;
+  width:30px;height:26px;border-radius:13px;
+  background:linear-gradient(135deg,var(--ocean-bright),var(--ocean-blue));
+  box-shadow:0 2px 8px rgba(21,101,192,.6);
+  transition:transform .3s cubic-bezier(.34,1.56,.64,1);
+  left:3px;
+}
+.lang-toggle.en-active::after{ transform:translateX(36px); }
+.lang-btn{
+  position:relative;z-index:1;flex:1;border:none;background:transparent;
+  font-size:11px;font-weight:700;cursor:pointer;transition:color .3s;
+  font-family:'Tajawal',sans-serif;color:rgba(255,255,255,.5);padding:0;
+}
+.lang-btn.active{ color:#fff; }
 
 /* Body */
 .chat-body{display:flex;flex:1;overflow:hidden}
@@ -131,7 +157,12 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;
 .send-btn:active{transform:scale(.97)}
 
 
-.status-bar{padding:5px 17px;background:rgba(0,0,0,.2);border-top:1px solid rgba(66,165,245,.08);display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
+.status-bar{display:none}
+.copyright-bar{display:none}
+.bottom-bar{display:flex;align-items:center;padding:5px 10px;background:rgba(0,0,0,.25);border-top:1px solid rgba(66,165,245,.07);flex-shrink:0;position:relative;}
+.bottom-status{display:flex;align-items:center;gap:5px;font-size:10px;color:rgba(255,255,255,.3);font-family:'Tajawal',sans-serif;flex-shrink:0;}
+.bottom-copy{flex:1;font-size:9px;line-height:1.5;color:rgba(255,255,255,.25);font-family:'Tajawal',sans-serif;text-align:center;}
+
 .status-dot{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-muted)}
 .dot-live{width:7px;height:7px;border-radius:50%;background:var(--success-green);animation:livePulse 2s ease-in-out infinite}
 @keyframes livePulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(1.3)}}
@@ -143,25 +174,73 @@ html[lang="en"] .input-field,html[lang="en"] .bubble,html[lang="en"] .title-text
 html[lang="en"] .status-dot,html[lang="en"] .status-info,html[lang="en"] .sidebar-label,
 html[lang="en"] .quick-btn,html[lang="en"] .city-select{font-family:'Inter',sans-serif!important}
 
+/* Exit Popup */
+.exit-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:999;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
+.exit-overlay.show{display:flex;}
+.exit-card{background:linear-gradient(135deg,#0d2444,#0a1828);border:1px solid var(--border-glow);border-radius:18px;padding:28px 24px;max-width:280px;width:88%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.7);}
+.exit-icon{font-size:32px;margin-bottom:12px;}
+.exit-title{font-size:16px;font-weight:700;color:#fff;margin-bottom:8px;font-family:'Tajawal',sans-serif;}
+.exit-sub{font-size:13px;color:rgba(255,255,255,.5);line-height:1.6;margin-bottom:20px;font-family:'Tajawal',sans-serif;}
+.exit-btns{display:flex;gap:10px;justify-content:center;}
+.exit-btn{padding:10px 20px;border-radius:10px;border:none;font-size:13px;font-weight:700;cursor:pointer;font-family:'Tajawal',sans-serif;transition:all .2s;}
+.exit-btn.confirm{background:rgba(255,70,70,.2);border:1px solid rgba(255,70,70,.4);color:#ff9090;}
+.exit-btn.confirm:hover{background:rgba(255,70,70,.35);}
+.exit-btn.cancel{background:rgba(66,165,245,.15);border:1px solid rgba(66,165,245,.3);color:#90caf9;}
+.exit-btn.cancel:hover{background:rgba(66,165,245,.28);}
+
 /* ===== MOBILE RESPONSIVE ===== */
 @media (max-width: 640px) {
-  body { padding: 0; overflow: auto; align-items: flex-start; }
-  .chat-window { height: 100svh; height: -webkit-fill-available; max-width: 100%; border-radius: 0; border: none; box-shadow: none; }
-  .title-bar { padding: 0 10px; height: 48px; gap: 6px; }
-  .ctrl-wrap { gap: 5px; }
+  body { padding: 0; overflow: hidden; align-items: flex-start; }
+  .chat-window { height: 100svh; height: 100dvh; max-width: 100%; border-radius: 0; border: none; box-shadow: none; overflow: hidden; display: flex; flex-direction: column; }
+  /* HEADER: row1 = controls+icon+title | row2 = switch+city */
+  .title-bar {
+    padding: 8px 12px 10px;
+    height: auto;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+  .tb-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    justify-content: space-between;
+  }
+  .ctrl-wrap { gap: 6px; }
   .ctrl-btn { width: 11px; height: 11px; }
-  .title-icon { width: 28px; height: 28px; font-size: 14px; }
-  .title-text { font-size: 12px; }
-  .city-select { max-width: 85px; font-size: 11px; padding: 4px 7px; }
-  .lang-btn { padding: 4px 8px; font-size: 11px; }
+  .title-icon { width: 28px; height: 28px; font-size: 14px; flex-shrink: 0; }
+  .title-text { font-size: 14px; font-weight: 700; flex: 1; }
+  .tb-right {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    padding: 0 2px;
+  }
+  .lang-toggle { width: 72px; height: 32px; flex-shrink: 0; margin-inline-end: auto; }
+  .lang-toggle::after { width: 27px; height: 26px; }
+  .lang-toggle.en-active::after { transform: translateX(37px); }
+  .lang-btn { font-size: 11px; }
+  .city-wrap {
+    flex-shrink: 0;
+    border-radius: 10px;
+  }
+  .city-wrap .city-select {
+    width: 100%;
+    font-size: 13px;
+    padding: 6px 4px;
+    border-radius: 0;
+    height: 34px;
+  }
   .chat-body { flex-direction: column; }
   .sidebar { width: 100%; height: auto; max-height: 52px; flex-direction: row; flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden; padding: 6px 8px; gap: 6px; border-inline-start: none; border-bottom: 1px solid var(--border-glow); -webkit-overflow-scrolling: touch; }
   .sidebar::-webkit-scrollbar { height: 0; width: 0; }
   .sidebar-label { display: none; }
   .quick-btn { min-width: max-content; width: auto; flex-shrink: 0; padding: 6px 12px; font-size: 12px; border-radius: 20px; white-space: nowrap; }
   .btn-icon { width: 20px; height: 20px; font-size: 11px; border-radius: 6px; }
-  .chat-area { flex: 1; min-height: 0; }
-  .messages { padding: 10px 12px; gap: 10px; }
+  .chat-area { flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
+  .messages { flex: 1; overflow-y: auto; padding: 10px 12px; gap: 10px; }
   .bubble { max-width: 88%; font-size: 13px; padding: 9px 12px; line-height: 1.65; }
   .avatar { width: 28px; height: 28px; font-size: 13px; }
   .input-area { padding: 8px 10px; gap: 7px; }
@@ -188,30 +267,99 @@ html[lang="en"] .quick-btn,html[lang="en"] .city-select{font-family:'Inter',sans
 
   <div class="title-bar">
     <div class="tb-left">
-      <div class="ctrl-wrap">
-        <div class="ctrl-btn ctrl-close"></div>
-        <div class="ctrl-btn ctrl-max"></div>
-        <div class="ctrl-btn ctrl-min"></div>
+      <div class="title-group">
+        <div class="ctrl-wrap">
+          <div class="ctrl-btn ctrl-close" onclick="window.close()"></div>
+          <div class="ctrl-btn ctrl-max"></div>
+          <div class="ctrl-btn ctrl-min"></div>
+        </div>
+        <div class="title-icon">🌊</div>
+        <span class="title-text" id="titleText">مساعد الطقفي والموج</span>
       </div>
-      <div class="title-icon">🌊</div>
-      <span class="title-text" id="titleText">مساعد الطقفي والموج</span>
+      <button class="ctrl-x-label" onclick="document.getElementById('exitOverlay').classList.add('show')">✕</button>
     </div>
     <div class="tb-right">
-      <select class="city-select" id="citySelect" onchange="onCityChange()">
-        <option value="muscat">🏙 مسقط</option>
-        <option value="salalah">🌴 صلالة</option>
-        <option value="sohar">⚓ صحار</option>
-        <option value="sur">🐢 صور</option>
-        <option value="nizwa">🏔 نزوى</option>
-        <option value="duqm">🛢 الدقم</option>
-        <option value="khasab">⛵ خصب</option>
-        <option value="masirah">🏝 مصيرة</option>
-        <option value="shinas">🎣 شناص</option>
-        <option value="barka">🌅 بركاء</option>
-      </select>
       <div class="lang-toggle">
         <button class="lang-btn active" id="btnAr" onclick="setLang('ar')">عربي</button>
         <button class="lang-btn" id="btnEn" onclick="setLang('en')">EN</button>
+      </div>
+      <div class="city-wrap">
+        <span class="city-pin">📍</span>
+        <select class="city-select" id="citySelect" onchange="onCityChange()">
+        <optgroup label="محافظة مسقط">
+          <option value="muscat">مسقط</option>
+          <option value="seeb">السيب</option>
+          <option value="bausher">بوشر</option>
+          <option value="mutrah">مطرح</option>
+          <option value="qurayyat">قريات</option>
+        </optgroup>
+        <optgroup label="محافظة ظفار">
+          <option value="salalah">صلالة</option>
+          <option value="thumrait">ثمريت</option>
+          <option value="mirbat">مرباط</option>
+          <option value="rakhyut">رخيوت</option>
+          <option value="shaleem">شليم</option>
+        </optgroup>
+        <optgroup label="محافظة مسندم">
+          <option value="khasab">خصب</option>
+          <option value="bukha">بخاء</option>
+          <option value="dibba">دبا</option>
+        </optgroup>
+        <optgroup label="محافظة البريمي">
+          <option value="buraimi">البريمي</option>
+          <option value="mahdah">محضة</option>
+          <option value="sunainah">السنينة</option>
+        </optgroup>
+        <optgroup label="محافظة الداخلية">
+          <option value="nizwa">نزوى</option>
+          <option value="bahla">بهلاء</option>
+          <option value="adam">آدم</option>
+          <option value="manah">منح</option>
+          <option value="izki">إزكي</option>
+          <option value="samail">سمائل</option>
+        </optgroup>
+        <optgroup label="محافظة جنوب الشرقية">
+          <option value="sur">صور</option>
+          <option value="masirah">مصيرة</option>
+          <option value="jalan">جعلان بني بوعلي</option>
+          <option value="jalanbuali">جعلان بني بوحسن</option>
+          <option value="wadi_bani_khalid">وادي بني خالد</option>
+        </optgroup>
+        <optgroup label="محافظة شمال الشرقية">
+          <option value="ibra">إبراء</option>
+          <option value="qabil">قابل</option>
+          <option value="mudaybi">المضيبي</option>
+          <option value="bidiya">بدية</option>
+          <option value="dima_taiin">ضماء والطائيين</option>
+          <option value="almudhaibi">المضيبي</option>
+        </optgroup>
+        <optgroup label="محافظة الوسطى">
+          <option value="duqm">الدقم</option>
+          <option value="haima">هيماء</option>
+          <option value="mahout">محوت</option>
+        </optgroup>
+        <optgroup label="محافظة الظاهرة">
+          <option value="ibri">عبري</option>
+          <option value="yanqul">ينقل</option>
+          <option value="dank">ضنك</option>
+        </optgroup>
+        <optgroup label="محافظة شمال الباطنة">
+          <option value="sohar">صحار</option>
+          <option value="shinas">شناص</option>
+          <option value="liwa">ليوا</option>
+          <option value="saham">صحم</option>
+          <option value="khabura">الخابورة</option>
+          <option value="suwaiq">السويق</option>
+        </optgroup>
+        <optgroup label="محافظة جنوب الباطنة">
+          <option value="barka">بركاء</option>
+          <option value="rustaq">الرستاق</option>
+          <option value="awabi">العوابي</option>
+          <option value="nakhal">نخل</option>
+          <option value="wadi_maawil">وادي المعاول</option>
+          <option value="msanaa">مصنعة</option>
+        </optgroup>
+        </select>
       </div>
     </div>
   </div>
@@ -240,29 +388,115 @@ html[lang="en"] .quick-btn,html[lang="en"] .city-select{font-family:'Inter',sans
         <input class="input-field" id="userInput" type="text" onkeydown="if(event.key==='Enter')sendMessage()"/>
         <button class="send-btn" id="sendBtn" onclick="sendMessage()">➤</button>
       </div>
-      <div class="status-bar">
-        <div class="status-dot"><div class="dot-live"></div><span id="statusText">متصل بالمنظومة البحرية</span></div>
-        <div class="status-info" id="statusInfo">بيانات عُمان والخليج العربي · عربي / English</div>
+      <div class="bottom-bar" id="bottomBar">
+        <div class="bottom-status"><div class="dot-live"></div><span id="statusText">متصل بالمنظومة البحرية</span></div>
+        <div class="bottom-copy">© <span id="copyrightYear"></span> جميع الحقوق محفوظة لشركة درّة الساحل<br>تم تطويره بواسطة Sheikha Al Hadei</div>
       </div>
     </div>
 
   </div>
 </div>
 
+<!-- Exit Confirmation Popup -->
+<div class="exit-overlay" id="exitOverlay">
+  <div class="exit-card">
+    <div class="exit-icon">⚠️</div>
+    <div class="exit-title">تأكيد الخروج</div>
+    <div class="exit-sub">لم يتم حفظ الدردشة<br>هل أنت متأكد أنك تود الخروج؟</div>
+    <div class="exit-btns">
+      <button class="exit-btn cancel" onclick="document.getElementById('exitOverlay').classList.remove('show')">البقاء</button>
+      <button class="exit-btn confirm" onclick="window.close()">خروج</button>
+    </div>
+  </div>
+</div>
+
 <script>
 var currentLang='ar', currentCity='muscat', conversationHistory=[];
 
+// حفظ الدردشة
+function saveChat(){
+  try{
+    var data={
+      history: conversationHistory,
+      html: document.getElementById('messages').innerHTML,
+      lang: currentLang,
+      city: currentCity,
+      time: Date.now()
+    };
+    localStorage.setItem('chatSession', JSON.stringify(data));
+  }catch(e){}
+}
+
+// استرجاع الدردشة
+function loadChat(){
+  try{
+    var raw=localStorage.getItem('chatSession');
+    if(!raw) return false;
+    var data=JSON.parse(raw);
+    if(Date.now()-data.time > 3600000){ localStorage.removeItem('chatSession'); return false; }
+    conversationHistory=data.history||[];
+    currentLang=data.lang||'ar';
+    currentCity=data.city||'muscat';
+    document.getElementById('citySelect').value=currentCity;
+    document.getElementById('messages').innerHTML=data.html||'';
+    applyLang();
+    return true;
+  }catch(e){ return false; }
+}
+document.getElementById('copyrightYear').textContent = new Date().getFullYear();
+
 var cities={
   muscat:{ar:'مسقط',en:'Muscat'},
+  seeb:{ar:'السيب',en:'Seeb'},
+  bausher:{ar:'بوشر',en:'Bausher'},
+  mutrah:{ar:'مطرح',en:'Mutrah'},
+  qurayyat:{ar:'قريات',en:'Qurayyat'},
   salalah:{ar:'صلالة',en:'Salalah'},
-  sohar:{ar:'صحار',en:'Sohar'},
-  sur:{ar:'صور',en:'Sur'},
-  nizwa:{ar:'نزوى',en:'Nizwa'},
-  duqm:{ar:'الدقم',en:'Duqm'},
+  thumrait:{ar:'ثمريت',en:'Thumrait'},
+  mirbat:{ar:'مرباط',en:'Mirbat'},
+  rakhyut:{ar:'رخيوت',en:'Rakhyut'},
+  shaleem:{ar:'شليم',en:'Shaleem'},
   khasab:{ar:'خصب',en:'Khasab'},
-  masirah:{ar:'جزيرة مصيرة',en:'Masirah Island'},
+  bukha:{ar:'بخاء',en:'Bukha'},
+  dibba:{ar:'دبا',en:'Dibba'},
+  buraimi:{ar:'البريمي',en:'Buraimi'},
+  mahdah:{ar:'محضة',en:'Mahdah'},
+  sunainah:{ar:'السنينة',en:'Sunainah'},
+  nizwa:{ar:'نزوى',en:'Nizwa'},
+  bahla:{ar:'بهلاء',en:'Bahla'},
+  adam:{ar:'آدم',en:'Adam'},
+  manah:{ar:'منح',en:'Manah'},
+  izki:{ar:'إزكي',en:'Izki'},
+  samail:{ar:'سمائل',en:'Samail'},
+  sur:{ar:'صور',en:'Sur'},
+  ibra:{ar:'إبراء',en:'Ibra'},
+  masirah:{ar:'مصيرة',en:'Masirah'},
+  qabil:{ar:'قابل',en:'Qabil'},
+  mudaybi:{ar:'المضيبي',en:'Mudaybi'},
+  jalan:{ar:'جعلان بني بوعلي',en:'Jalan Bani Bu Ali'},
+  duqm:{ar:'الدقم',en:'Duqm'},
+  haima:{ar:'هيماء',en:'Haima'},
+  mahout:{ar:'محوت',en:'Mahout'},
+  ibri:{ar:'عبري',en:'Ibri'},
+  yanqul:{ar:'ينقل',en:'Yanqul'},
+  dank:{ar:'ضنك',en:'Dank'},
+  sohar:{ar:'صحار',en:'Sohar'},
   shinas:{ar:'شناص',en:'Shinas'},
-  barka:{ar:'بركاء',en:'Barka'}
+  liwa:{ar:'ليوا',en:'Liwa'},
+  saham:{ar:'صحم',en:'Saham'},
+  barka:{ar:'بركاء',en:'Barka'},
+  rustaq:{ar:'الرستاق',en:'Rustaq'},
+  awabi:{ar:'العوابي',en:'Awabi'},
+  nakhal:{ar:'نخل',en:'Nakhal'},
+  khabura:{ar:'الخابورة',en:'Khabura'},
+  suwaiq:{ar:'السويق',en:'Suwaiq'},
+  wadi_maawil:{ar:'وادي المعاول',en:'Wadi Al Maawil'},
+  msanaa:{ar:'مصنعة',en:'Msanaa'},
+  jalanbuali:{ar:'جعلان بني بوحسن',en:'Jalan Bani Bu Hassan'},
+  wadi_bani_khalid:{ar:'وادي بني خالد',en:'Wadi Bani Khalid'},
+  bidiya:{ar:'بدية',en:'Bidiya'},
+  dima_taiin:{ar:'ضماء والطائيين',en:'Dima Wa Al Taiyeen'},
+  almudhaibi:{ar:'المضيبي',en:'Al Mudhaibiy'}
 };
 
 var T={
@@ -302,10 +536,11 @@ function applyLang(){
   document.getElementById('titleText').textContent=t.title;
   document.getElementById('sidebarLabel').textContent=t.sidebarLabel;
   document.getElementById('userInput').placeholder=t.placeholder;
-  document.getElementById('statusText').textContent=t.statusConn;
-  document.getElementById('statusInfo').textContent=t.statusInfo;
+  var stEl=document.getElementById('statusText'); if(stEl) stEl.textContent=t.statusConn;
+  var siEl=document.getElementById('statusInfo'); if(siEl) siEl.textContent=t.statusInfo;
   document.getElementById('btnAr').classList.toggle('active',isAr);
   document.getElementById('btnEn').classList.toggle('active',!isAr);
+  document.querySelector('.lang-toggle').classList.toggle('en-active',!isAr);
   // Update city option labels
   updateCityLabels();
   // Update quick button texts
@@ -318,10 +553,9 @@ function applyLang(){
 function updateCityLabels(){
   var sel=document.getElementById('citySelect');
   var isAr=currentLang==='ar';
-  var icons={'muscat':'🏙','salalah':'🌴','sohar':'⚓','sur':'🐢','nizwa':'🏔','duqm':'🛢','khasab':'⛵','masirah':'🏝','shinas':'🎣','barka':'🌅'};
   Array.from(sel.options).forEach(function(opt){
     var key=opt.value;
-    opt.textContent=icons[key]+' '+(isAr?cities[key].ar:cities[key].en);
+    if(cities[key]) opt.textContent=(isAr?cities[key].ar:cities[key].en);
   });
 }
 
@@ -388,14 +622,57 @@ function removeTyping(){var t=document.getElementById('typing-ind');if(t)t.remov
 
 // إحداثيات المدن
 var CITY_COORDS={
-  muscat:{lat:23.6,lon:58.6},
-  salalah:{lat:17.0,lon:54.1},
-  sohar:{lat:24.4,lon:56.7},
-  nizwa:{lat:22.9,lon:57.5},
-  khasab:{lat:26.2,lon:56.2},
-  sur:{lat:22.5,lon:59.5},
-  duqm:{lat:19.7,lon:57.7},
-  masirah:{lat:20.7,lon:58.9}
+  muscat:{lat:23.6133,lon:58.5922},
+  seeb:{lat:23.6833,lon:58.1833},
+  bausher:{lat:23.6300,lon:58.5600},
+  mutrah:{lat:23.6300,lon:58.5900},
+  qurayyat:{lat:23.2833,lon:58.9000},
+  salalah:{lat:17.0151,lon:54.0924},
+  thumrait:{lat:17.6667,lon:54.0167},
+  mirbat:{lat:16.9833,lon:54.6833},
+  rakhyut:{lat:16.7500,lon:53.4167},
+  shaleem:{lat:17.5833,lon:55.5833},
+  khasab:{lat:26.1833,lon:56.2500},
+  bukha:{lat:26.1667,lon:56.1500},
+  dibba:{lat:25.6167,lon:56.2667},
+  buraimi:{lat:24.2333,lon:55.7833},
+  mahdah:{lat:24.4167,lon:55.9833},
+  sunainah:{lat:24.2000,lon:55.8500},
+  nizwa:{lat:22.9333,lon:57.5333},
+  bahla:{lat:22.9667,lon:57.3000},
+  adam:{lat:22.3833,lon:57.5333},
+  manah:{lat:22.8833,lon:57.5667},
+  izki:{lat:22.9333,lon:57.7833},
+  samail:{lat:23.3000,lon:57.9833},
+  sur:{lat:22.5667,lon:59.5289},
+  ibra:{lat:22.6833,lon:58.5333},
+  masirah:{lat:20.6833,lon:58.8833},
+  qabil:{lat:22.9167,lon:58.4667},
+  mudaybi:{lat:22.5667,lon:58.1333},
+  jalan:{lat:22.1167,lon:59.1500},
+  duqm:{lat:19.6500,lon:57.7000},
+  haima:{lat:19.9500,lon:56.2833},
+  mahout:{lat:20.6667,lon:58.6333},
+  ibri:{lat:23.2167,lon:56.5167},
+  yanqul:{lat:23.5833,lon:56.2667},
+  dank:{lat:23.5500,lon:56.7167},
+  sohar:{lat:24.3667,lon:56.7333},
+  shinas:{lat:24.7500,lon:56.4667},
+  liwa:{lat:24.5167,lon:56.5500},
+  saham:{lat:24.1667,lon:56.8833},
+  barka:{lat:23.6833,lon:57.8833},
+  rustaq:{lat:23.3833,lon:57.4167},
+  awabi:{lat:23.3000,lon:57.5333},
+  nakhal:{lat:23.3833,lon:57.8333},
+  khabura:{lat:23.9833,lon:57.0833},
+  suwaiq:{lat:23.8500,lon:57.4333},
+  wadi_maawil:{lat:23.6000,lon:57.7000},
+  msanaa:{lat:23.7167,lon:57.6167},
+  jalanbuali:{lat:22.0500,lon:59.2000},
+  wadi_bani_khalid:{lat:22.5500,lon:58.8000},
+  bidiya:{lat:22.7833,lon:58.1000},
+  dima_taiin:{lat:23.2333,lon:57.8667},
+  almudhaibi:{lat:22.5667,lon:58.1333}
 };
 
 // كاش البيانات — صالح 10 دقائق
@@ -563,6 +840,7 @@ ${weatherData}
 🌊 المد والجزر: المنسوب + الحالة + وقت التغيير القادم
 
 تعامل بشكل طبيعي مع المستخدم — رد على التحيات والكلام العادي بشكل ودود وقصير.
+إذا سأل المستخدم عن منطقة أو مدينة غير المدينة الحالية (${cityName}): لا تجيب عن بيانات تلك المنطقة، بل قل له باختصار: "لمعرفة معلومات [المنطقة] قم بتغيير المنطقة من القائمة في الأعلى 📍"
 أسئلة الأنشطة البحرية (سباحة، غوص، صيد، كاياك، شنركل، تجديف، رياضات بحرية) كلها ضمن تخصصك — أجب عليها بتحليل بيانات الطقس والبحر.
 لكن إذا سألك عن أي موضوع آخر غير الطقس والبحر والأنشطة البحرية (مثل الطبخ، الرياضة البرية، السياسة، الأخبار، إلخ): قل بشكل طبيعي "هذا ما أقدر أساعدك فيه، أنا متخصص بالطقس البحري فقط" — بدون تفصيل زيادة.`;
 
@@ -598,12 +876,14 @@ async function sendMessage(text){
   input.value='';
   addMessage(msg,'user');
   conversationHistory.push({role:'user',content:msg});
+  saveChat();
   addTyping();
   try{
     var reply=await callAPI(msg);
     removeTyping();
     addMessage(reply,'bot');
     conversationHistory.push({role:'assistant',content:reply});
+    saveChat();
   }catch(e){
     removeTyping();
     addMessage(T[currentLang].errMsg,'bot');
@@ -628,7 +908,9 @@ function init(){
     var b=document.getElementById('q'+i);
     if(b) b.querySelector('.qtext').textContent=q;
   });
-  addMessage(t.welcome(currentCity)+'<div class="weather-chips">'+t.chips.map(function(c){return'<span class="chip">'+c+'</span>'}).join('')+'</div>','bot',false);
+  if(!loadChat()){
+    addMessage(t.welcome(currentCity)+'<div class="weather-chips">'+t.chips.map(function(c){return'<span class="chip">'+c+'</span>'}).join('')+'</div>','bot',false);
+  }
 }
 
 init();
